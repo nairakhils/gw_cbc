@@ -2,3 +2,4 @@ streamlit
 pycbc
 matplotlib
 pandas
+scipy
