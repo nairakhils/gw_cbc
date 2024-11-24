@@ -4,6 +4,7 @@ from pycbc.psd import aLIGOZeroDetHighPower
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.signal import spectrogram
 
 # Web app title
 st.title("Gravitational Waveform Visualizer")
@@ -85,6 +86,23 @@ try:
     ax_psd.set_ylabel("Strain Noise")
     ax_psd.grid(which='both', linestyle='--', linewidth=0.5)
     st.pyplot(fig_psd)
+
+    # Compute and plot spectrogram for h+
+    st.subheader("Spectrogram of the Gravitational Waveform (h+)")
+    fs = 1 / delta_t  # Sampling frequency
+    frequencies, times, Sxx = spectrogram(hp.numpy(), fs=fs, nperseg=1024, noverlap=512)
+    Sxx_norm = Sxx / np.max(Sxx)  # Normalize the spectrogram
+    fig_spec, ax_spec = plt.subplots()
+    pcm = ax_spec.pcolormesh(
+        times - times[-1] / 2, frequencies, Sxx_norm, shading='gouraud', cmap='viridis'
+    )
+    ax_spec.set_title("Spectrogram of h+ (plus polarization)")
+    ax_spec.set_xlabel("Time (s)")
+    ax_spec.set_ylabel("Frequency (Hz)")
+    ax_spec.set_ylim(10, 500)  # Focus on GW-detection range
+    ax_spec.set_yscale('log')  # Use log scale for frequency
+    fig_spec.colorbar(pcm, ax=ax_spec, label="Normalized Energy")
+    st.pyplot(fig_spec)
 
 except Exception as e:
     st.error(f"Error generating time-domain waveform: {e}")
