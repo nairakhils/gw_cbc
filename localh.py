@@ -25,7 +25,7 @@ delta_t = st.sidebar.select_slider(
 
 f_lower = st.sidebar.slider("Lower Frequency (Hz)", 10, 100, 30)
 
-# Generate waveform
+# Generate time-domain waveform
 try:
     hp, hc = get_td_waveform(
         approximant=approximant,
@@ -36,16 +36,20 @@ try:
         distance=distance,
     )
 
-    # Plot waveform
-    st.subheader("Generated Gravitational Waveform")
-    fig, ax = plt.subplots()
-    ax.plot(hp.sample_times, hp, label="h+ (plus polarization)")
-    ax.plot(hc.sample_times, hc, label="hx (cross polarization)")
-    ax.set_title("Gravitational Waveform")
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Strain")
-    ax.legend()
-    st.pyplot(fig)
+    # Calculate chirp mass and add it as a feature
+    chirp_mass = ((mass1 * mass2)**(3/5)) / ((mass1 + mass2)**(1/5))
+    st.sidebar.markdown(f"**Chirp Mass:** {chirp_mass:.2f} Solar Masses")
+
+    # Plot time-domain waveform
+    st.subheader("Generated Time-Domain Gravitational Waveform")
+    fig_td, ax_td = plt.subplots()
+    ax_td.plot(hp.sample_times, hp, label="h+ (plus polarization)")
+    ax_td.plot(hc.sample_times, hc, label="hx (cross polarization)")
+    ax_td.set_title("Time-Domain Gravitational Waveform")
+    ax_td.set_xlabel("Time (s)")
+    ax_td.set_ylabel("Strain")
+    ax_td.legend()
+    st.pyplot(fig_td)
 
 except Exception as e:
-    st.error(f"Error generating waveform: {e}")
+    st.error(f"Error generating time-domain waveform: {e}")
